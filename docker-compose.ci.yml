@@ -1,0 +1,102 @@
+#
+# Docker compose que levanta el entorno de CI/CD.
+#
+# Es una version basica para poder acceder directamente a los servidores como:
+#
+# http://nexus.local:9000
+# http://sonarqube.local:8181
+# http://jenkins.local:8080
+#
+# Siempre y cuando hayamos configurado en el fichero de hosts de nuestro PC:
+# 127.0.0.1 nexus.local sonarqube.local jenkins.local
+#
+
+# Este será el nombre del proyecto (prefijo de los contenedores), 
+# en vez de usar el nombre de la carpeta donde se ubique el docker-compose.ci.yml
+name: cicd_lab
+
+services:
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus
+    hostname: nexus-server
+    networks:
+      default:
+        aliases:
+          - repositorio-nexus
+          - nexus.local
+    ports:
+      - "8081:8081"
+      - "5000:5000"      
+    volumes:
+      - nexus-data:/nexus-data
+
+  sonarqube:
+    image: sonarqube:lts
+    container_name: sonarqube
+    hostname: sonarqube-server
+    networks:
+      default:
+        aliases:
+          - calidad-sonar
+          - sonarqube.local
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    container_name: sonarqube-db
+    hostname: postgres-server
+    networks:
+      default:
+        aliases:
+          - db
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - sonar-db:/var/lib/postgresql/data
+
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    hostname: jenkins-server
+    networks:
+      default:
+        aliases:
+          - ci-jenkins
+          - jenkins.local
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+      #CASC_JENKINS_CONFIG: "/var/jenkins_home/casc_configs"
+    volumes:
+      # tu home de Jenkins (persistente)
+      - jenkins-home:/var/jenkins_home
+      # Docker Desktop de Windows expone el daemon aquí
+      # monta el socket real de Docker en WSL2
+      - /var/run/docker.sock:/var/run/docker.sock    
+
+    depends_on:
+      - nexus
+      - sonarqube
+
+volumes:
+  nexus-data:
+  sonar-db:
+  jenkins-home:
+
+networks:
+  default:
+    name: cicd-net
