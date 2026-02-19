@@ -100,6 +100,8 @@ services:
     environment:
       - NGROK_AUTHTOKEN=39slt3whWOPO0bK7TDTtfQpDI6L_4NaJtKfGhhUZUNvsHLBDC
     command: authtoken 39slt3whWOPO0bK7TDTtfQpDI6L_4NaJtKfGhhUZUNvsHLBDC
+    volumes:
+    - ngrok-config:/home/ngrok/.config/ngrok
     ports:
       - "4040:4040"
     depends_on:
