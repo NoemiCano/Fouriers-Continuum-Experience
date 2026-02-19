@@ -19,7 +19,7 @@ pipeline {
 
         stage('Install Frontend') {
             steps {
-                dir('Frontend') {
+                dir('Front-End') {
                     sh 'npm install'
                 }
             }
@@ -27,7 +27,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir('Frontend') {
+                dir('Front-End') {
                     sh 'ng build --prod'
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                dir('Frontend') {
+                dir('Front-End') {
                     withSonarQubeEnv("${SONARQUBE_ENV}") {
                         sh 'sonar-scanner'
                     }
@@ -45,7 +45,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('Backend') {
+                dir('Back-End') {
                     sh 'docker build -t its-be .'
                 }
             }
