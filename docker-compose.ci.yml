@@ -92,6 +92,19 @@ services:
       - nexus
       - sonarqube
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: ngrok
+    networks:
+      - default
+    environment:
+      - NGROK_AUTHTOKEN=TU_TOKEN_AQUI
+    command: http jenkins:8080
+    ports:
+      - "4040:4040"
+    depends_on:
+      - jenkins
+
 volumes:
   nexus-data:
   sonar-db:
