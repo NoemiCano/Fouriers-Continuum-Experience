@@ -111,6 +111,7 @@ volumes:
   nexus-data:
   sonar-db:
   jenkins-home:
+  ngrok-config:
 
 networks:
   default:
