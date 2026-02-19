@@ -17,7 +17,7 @@ pipeline {
             }
         }
 
-        stage('Install Front-End') {
+        stage('Install Frontend') {
             steps {
                 dir('Front-End') {
                     sh 'npm install'
@@ -25,7 +25,7 @@ pipeline {
             }
         }
 
-        stage('Build Front-End') {
+        stage('Build Frontend') {
             steps {
                 dir('Front-End') {
                     sh 'ng build --prod'
