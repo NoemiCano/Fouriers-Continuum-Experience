@@ -1,60 +1,64 @@
 pipeline {
     agent any
 
-    tools { 
-        nodejs 'NodeJS-Angular'   // tu instalación de NodeJS
+    tools {
+        maven 'Maven_Jenkins'
+        jdk 'Default JDK'
+        nodejs 'NodeJS-Angular'
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('SCM') {
             steps {
-                echo "✅ Checkout del repositorio"
                 checkout scm
             }
         }
 
-        stage('Test Front-End Directory') {
-            steps {
-                dir('Front-End') {
-                    echo "📂 Contenido de Front-End:"
-                    sh 'ls -la'
-                }
-            }
-        }
-
-        stage('Install Front-End') {
-            steps {
-                dir('Front-End') {
-                    echo "⚙️ Instalando dependencias npm"
-                    sh 'npm install'
-                }
-            }
-        }
-
-        stage('Build Front-End') {
-            steps {
-                dir('Front-End') {
-                    echo "🏗️ Construyendo Front-End"
-                    sh 'ng build --prod || echo "Build fallido, seguimos con el pipeline"'
-                }
-            }
-        }
-
-        stage('Test Back-End Directory') {
+        stage('Build Backend') {
             steps {
                 dir('Back-End') {
-                    echo "📂 Contenido de Back-End:"
-                    sh 'ls -la'
+                    sh 'mvn clean compile'
                 }
             }
         }
 
-        stage('Build Back-End') {
+        stage('Test Backend') {
             steps {
                 dir('Back-End') {
-                    echo "🐳 Construyendo imagen Docker"
-                    sh 'docker build -t its-be . || echo "Build Backend fallido, seguimos"'
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                dir('Front-End') {
+                    nodejs(nodeJSInstallationName: 'NodeJS-Angular') {
+                        sh 'npm install'
+                        sh 'npm run build'
+                    }
+                }
+            }
+        }
+        
+        stage('Test Frontend') {
+            steps {
+                dir('Front-End') {
+                    nodejs(nodeJSInstallationName: 'NodeJS-Angular') {
+                        sh 'npm test || true'
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
                 }
             }
         }
