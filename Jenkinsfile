@@ -30,7 +30,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    sh 'docker build -t its-be .'
+                    sh 'ng build'
                 }
             }
         }
