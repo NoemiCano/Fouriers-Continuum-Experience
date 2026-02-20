@@ -15,6 +15,16 @@ pipeline {
             }
         }
 
+        stage('SonarQube Backend') {
+            steps {
+                dir('Back-End') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh 'mvn clean verify sonar:sonar'
+                    }
+                }
+            }
+        }
+
         stage('Build Backend') {
             steps {
                 dir('Back-End') {
