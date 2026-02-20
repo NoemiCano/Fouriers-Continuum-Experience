@@ -3,6 +3,8 @@ pipeline {
 
     tools { 
         nodejs 'NodeJS-Angular'
+        maven "Maven_Jenkins"
+        jdk "Default JDK"
     }
 
     environment {
@@ -11,17 +13,9 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('SCM') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Install Frontend') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    sh 'npm install'
-                }
             }
         }
 
