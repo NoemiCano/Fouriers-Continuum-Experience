@@ -49,11 +49,11 @@ pipeline {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                     withSonarQubeEnv('sonarqube') {
-                        def scannerHome = tool 'SonarScanner'
-                        sh "${scannerHome}/bin/sonar-scanner"
+                        sh "${tool('SonarScanner')}/bin/sonar-scanner"
                     }
                 }
             }
+
         }
         
         
