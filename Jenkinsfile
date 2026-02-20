@@ -37,7 +37,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                     withSonarQubeEnv('sonarqube') {
                         sh "mvn clean verify sonar:sonar"
                     }
