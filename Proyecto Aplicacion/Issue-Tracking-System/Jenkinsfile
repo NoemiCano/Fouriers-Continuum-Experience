@@ -15,6 +15,15 @@ pipeline {
             }
         }
 
+        stage('Debug Backend Structure') {
+            steps {
+                sh 'ls -la'
+                dir('Back-End') {
+                    sh 'ls -la'
+                }
+            }
+        }
+
         stage('SonarQube Backend') {
             steps {
                 dir('Back-End') {
