@@ -29,14 +29,13 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                    withSonarQubeEnv("${SONARQUBE_ENV}") {
-                        script {
-                            def scannerHome = tool name: 'sonarqube', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                            sh "${scannerHome}/bin/sonar-scanner"
-                        }
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh "mvn clean verify sonar:sonar"
                     }
                 }
             }
+        }
 
         stage('Build Backend') {
             steps {
