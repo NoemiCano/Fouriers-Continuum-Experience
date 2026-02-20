@@ -28,12 +28,9 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    withSonarQubeEnv("${SONARQUBE_ENV}") {
-                        sh 'sonar-scanner'
-                    }
-                }
+            def scannerHome = tool 'SonarScanner';
+            withSonarQubeEnv('sonarqube') {
+            sh "${scannerHome}/bin/sonar-scanner"
             }
         }
 
