@@ -18,7 +18,7 @@ pipeline {
         stage('Debug Backend Structure') {
             steps {
                 sh 'ls -la'
-                dir('Back-End') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                     sh 'ls -la'
                 }
             }
@@ -26,7 +26,7 @@ pipeline {
 
         stage('SonarQube Backend') {
             steps {
-                dir('Back-End') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                     withSonarQubeEnv('sonarqube') {
                         sh 'mvn clean verify sonar:sonar'
                     }
@@ -36,7 +36,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('Back-End') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                     sh 'mvn clean compile'
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
 
         stage('Test Backend') {
             steps {
-                dir('Back-End') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                     sh 'mvn test'
                 }
             }
@@ -52,7 +52,7 @@ pipeline {
 
         stage('Build Frontend') {
             steps {
-                dir('Front-End') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                     nodejs(nodeJSInstallationName: 'NodeJS-Angular') {
                         sh 'npm install'
                         sh 'npm run build'
@@ -63,7 +63,7 @@ pipeline {
         
         stage('Test Frontend') {
             steps {
-                dir('Front-End') {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                     nodejs(nodeJSInstallationName: 'NodeJS-Angular') {
                         sh 'npm test || true'
                     }
