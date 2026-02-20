@@ -27,6 +27,14 @@ pipeline {
             }
         }
 
+        stage('Build Backend') {
+            steps {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
+                    sh 'docker build -t its-be .'
+                }
+            }
+        }
+
         stage('SonarQube Analysis') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
@@ -36,13 +44,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Backend') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    sh 'docker build -t its-be .'
-                }
-            }
-        }
+        
     }
 }
