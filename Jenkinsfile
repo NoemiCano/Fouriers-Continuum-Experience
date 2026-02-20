@@ -1,34 +1,43 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven_Jenkins'
-        jdk 'Default JDK'
+    tools { 
         nodejs 'NodeJS-Angular'
+    }
+
+    environment {
+        SONARQUBE_ENV = 'sonarqube'
     }
 
     stages {
 
-        stage('SCM') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Debug Backend Structure') {
+        stage('Install Frontend') {
             steps {
-                sh 'ls -la'
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    sh 'ls -la'
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                    sh 'npm install'
                 }
             }
         }
 
-        stage('SonarQube Backend') {
+        stage('Build Frontend') {
             steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh 'mvn clean verify sonar:sonar'
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                    sh 'ng build'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                    withSonarQubeEnv("${SONARQUBE_ENV}") {
+                        sh 'sonar-scanner'
                     }
                 }
             }
@@ -37,47 +46,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    sh 'mvn clean compile'
-                }
-            }
-        }
-
-        stage('Test Backend') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    sh 'mvn test'
-                }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    nodejs(nodeJSInstallationName: 'NodeJS-Angular') {
-                        sh 'npm install'
-                        sh 'npm run build'
-                    }
-                }
-            }
-        }
-        
-        stage('Test Frontend') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    nodejs(nodeJSInstallationName: 'NodeJS-Angular') {
-                        sh 'npm test || true'
-                    }
-                }
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('sonarqube') {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
+                    sh 'docker build -t its-be .'
                 }
             }
         }
