@@ -48,13 +48,13 @@ pipeline {
         stage('SonarQube Analysis Frontend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    withSonarQubeEnv("${SONARQUBE_ENV}") {
-                        sh 'sonar-scanner'
+                    withSonarQubeEnv('sonarqube') {
+                        def scannerHome = tool 'SonarScanner'
+                        sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
             }
         }
-
         
         
     }
