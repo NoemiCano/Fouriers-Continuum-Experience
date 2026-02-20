@@ -19,16 +19,6 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    withSonarQubeEnv('sonarqube') {
-                        sh "mvn clean verify sonar:sonar"
-                    }
-                }
-            }
-        }
-
         stage('Build Frontend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
@@ -41,6 +31,16 @@ pipeline {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                     sh 'mvn clean compile'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('Proyecto Aplicacion/Issue-Tracking-System') {
+                    withSonarQubeEnv('sonarqube') {
+                        sh "mvn clean verify sonar:sonar"
+                    }
                 }
             }
         }
