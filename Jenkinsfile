@@ -35,13 +35,26 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('SonarQube Analysis Backend') {
             steps {
-                    withSonarQubeEnv('sonarqube') {
-                        sh "mvn clean verify sonar:sonar"
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
+                    withSonarQubeEnv("${SONARQUBE_ENV}") {
+                        sh 'mvn sonar:sonar'
                     }
+                }
             }
         }
+
+        stage('SonarQube Analysis Frontend') {
+            steps {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                    withSonarQubeEnv("${SONARQUBE_ENV}") {
+                        sh 'sonar-scanner'
+                    }
+                }
+            }
+        }
+
         
         
     }
