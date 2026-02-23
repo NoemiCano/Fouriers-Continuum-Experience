@@ -54,9 +54,6 @@ pipeline {
         }
 
         stage('SonarQube Analysis Frontend') {
-            tools {
-                nodejs 'NodeJS-Moderno'
-            }
             steps {
                     dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                         withSonarQubeEnv('sonarqube') {
