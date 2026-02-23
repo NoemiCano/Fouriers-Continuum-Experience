@@ -58,7 +58,7 @@ pipeline {
                 nodejs(nodeJSInstallationName: 'NodeJS-Moderno') {
                     dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                         withSonarQubeEnv('sonarqube') {
-                            sh 'sonar-scanner'
+                            sh "${tool('SonarScanner')}/bin/sonar-scanner"
                         }
                     }
                 }
