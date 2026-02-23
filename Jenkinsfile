@@ -22,7 +22,7 @@ pipeline {
         stage('Install Front-end Dependencies') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    sh 'npm install'
+                    sh 'npm install --ignore-scripts'
                 }
             }
         }
@@ -55,11 +55,13 @@ pipeline {
 
         stage('SonarQube Analysis Frontend') {
             steps {
+                nodejs(nodeJSInstallationName: 'NodeJS-Moderno') {
                     dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                         withSonarQubeEnv('sonarqube') {
                             sh "${tool('SonarScanner')}/bin/sonar-scanner"
                         }
                     }
+                }
             }
         }
     }
