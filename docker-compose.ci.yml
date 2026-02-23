@@ -68,9 +68,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.jenkins
-    image: jenkins/jenkins:lts
+    image: jenkins-custom:latest
     container_name: jenkins
     hostname: jenkins-server
+    user: root
     networks:
       default:
         aliases:
