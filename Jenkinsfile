@@ -58,7 +58,6 @@ pipeline {
                 nodejs 'NodeJS-Moderno'
             }
             steps {
-                def scannerHome = tool 'SonarScanner'
                     dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                         withSonarQubeEnv('sonarqube') {
                             sh "${tool('SonarScanner')}/bin/sonar-scanner"
