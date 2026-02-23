@@ -54,14 +54,16 @@ pipeline {
         }
 
         stage('SonarQube Analysis Frontend') {
+            tools {
+                nodejs 'NodeJS-Moderno'
+            }
             steps {
-                nodejs(nodeJSInstallationName: 'NodeJS-Moderno') {
+                def scannerHome = tool 'SonarScanner'
                     dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                         withSonarQubeEnv('sonarqube') {
                             sh "${tool('SonarScanner')}/bin/sonar-scanner"
                         }
                     }
-                }
             }
         }
     }
