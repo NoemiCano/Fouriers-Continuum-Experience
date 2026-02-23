@@ -64,5 +64,44 @@ pipeline {
                 }
             }
         }
+
+        stage('Compile Backend') {
+            steps {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
+                    // CAMBIO IMPORTANTE: Usamos 'package' para generar el archivo .jar
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Docker Build & Push to Nexus') {
+            steps {
+                script {
+                    // URL de tu repositorio Docker en Nexus
+                    def nexusRegistry = "localhost:5000" 
+                    def backImageName = "${nexusRegistry}/its-backend"
+                    def frontImageName = "${nexusRegistry}/its-frontend"
+
+                    // Usamos las credenciales guardadas en Jenkins
+                    docker.withRegistry("http://${nexusRegistry}", 'nexus-docker-credentials') {
+                        
+                        // 1. Construir y subir el Back-End
+                        dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
+                            // Construimos la imagen con el tag del número de build
+                            def backImage = docker.build("${backImageName}:${env.BUILD_NUMBER}")
+                            backImage.push()
+                            backImage.push("latest")
+                        }
+
+                        // 2. Construir y subir el Front-End
+                        dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                            def frontImage = docker.build("${frontImageName}:${env.BUILD_NUMBER}")
+                            frontImage.push()
+                            frontImage.push("latest")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
