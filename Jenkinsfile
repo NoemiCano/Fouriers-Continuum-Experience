@@ -79,7 +79,7 @@ pipeline {
             steps {
                 script {
                     // URL de tu repositorio Docker en Nexus
-                    def nexusRegistry = "nexus:5000" 
+                    def nexusRegistry = "host.docker.internal:5000" 
                     def backImageName = "${nexusRegistry}/its-backend"
                     def frontImageName = "${nexusRegistry}/its-frontend"
 
