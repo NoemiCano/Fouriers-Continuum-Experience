@@ -78,27 +78,29 @@ pipeline {
         stage('Docker Build & Push to Nexus') {
             steps {
                 script {
-                    // URL de tu repositorio Docker en Nexus
+                    // Mantenemos tu configuración que ya funciona
                     def nexusRegistry = "host.docker.internal:5000" 
                     def backImageName = "${nexusRegistry}/its-backend"
                     def frontImageName = "${nexusRegistry}/its-frontend"
 
-                    // Usamos las credenciales guardadas en Jenkins
-                    docker.withRegistry("http://${nexusRegistry}", 'nexus-docker-credentials') {
+                    // ESTA LÍNEA ES LA CLAVE: Evita que Docker use el proxy para la red local
+                    withEnv(["NO_PROXY=host.docker.internal,nexus,127.0.0.1,localhost"]) {
                         
-                        // 1. Construir y subir el Back-End
-                        dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                            // Construimos la imagen con el tag del número de build
-                            def backImage = docker.build("${backImageName}:${env.BUILD_NUMBER}")
-                            backImage.push()
-                            backImage.push("latest")
-                        }
+                        docker.withRegistry("http://${nexusRegistry}", 'nexus-docker-credentials') {
+                            
+                            // 1. Backend (Ya funcionaba, pero lo repetimos)
+                            dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
+                                def backImage = docker.build("${backImageName}:${env.BUILD_NUMBER}")
+                                backImage.push()
+                                backImage.push("latest")
+                            }
 
-                        // 2. Construir y subir el Front-End
-                        dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                            def frontImage = docker.build("${frontImageName}:${env.BUILD_NUMBER}")
-                            frontImage.push()
-                            frontImage.push("latest")
+                            // 2. Frontend (Aquí es donde fallaba)
+                            dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                                def frontImage = docker.build("${frontImageName}:${env.BUILD_NUMBER}")
+                                frontImage.push()
+                                frontImage.push("latest")
+                            }
                         }
                     }
                 }
