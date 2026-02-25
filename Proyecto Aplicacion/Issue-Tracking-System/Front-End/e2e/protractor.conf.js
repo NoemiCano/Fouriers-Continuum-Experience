@@ -13,7 +13,15 @@ exports.config = {
     './src/**/*.e2e-spec.ts'
   ],
   capabilities: {
-    'browserName': 'chrome'
+    'browserName': 'chrome', // A partir de aquí lineas metidas por mi
+    chromeOptions: {
+      args: [
+        "--headless",          // No abre ventana física
+        "--no-sandbox",       // Necesario para correr como root en Docker
+        "--disable-dev-shm-usage", // Evita errores de memoria en contenedores
+        "--window-size=1920,1080"  // Define un tamaño de pantalla virtual
+      ]
+    } // Hasta aquí lineas metidas por mi
   },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
