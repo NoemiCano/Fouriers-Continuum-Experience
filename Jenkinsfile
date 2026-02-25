@@ -36,13 +36,22 @@ pipeline {
             }
         }
 
-        stage('Build Backend') {
+        stage('Compile & Package Backend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    sh 'mvn clean compile'
+                    // CAMBIO IMPORTANTE: Usamos 'package' para generar el archivo .jar
+                    sh 'mvn clean package -DskipTests'
                 }
             }
         }
+
+        // stage('Build Backend') {
+        //     steps {
+        //         dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
+        //             sh 'mvn clean compile'
+        //         }
+        //     }
+        // }
 
         stage('SonarQube Analysis Backend') {
             steps {
@@ -66,14 +75,27 @@ pipeline {
             }
         }
 
-        stage('Compile Backend') {
+        // Pruebas de integración del Back y Front
+
+        stage('Integration Tests - Backend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    // CAMBIO IMPORTANTE: Usamos 'package' para generar el archivo .jar
-                    sh 'mvn clean package -DskipTests'
+                    // Maven usa 'verify' para ejecutar pruebas de integración
+                    sh 'mvn verify -DskipUnitTests' 
                 }
             }
         }
+
+        stage('E2E Testing - Frontend') {
+            steps {
+                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                    // Ejecuta las pruebas de escenario (End-to-End)
+                    sh 'npm run e2e' 
+                }
+            }
+        }
+
+        // Publicación final en Nexus
 
         stage('Docker Build & Push to Nexus') {
             steps {
