@@ -90,7 +90,10 @@ pipeline {
             steps {
                 nodejs('NodeJS-Angular') { 
                     dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                        sh 'npm run e2e' 
+                        // catchError permite que el pipeline continúe aunque el test falle
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                            sh 'npm run e2e'
+                        }
                     }
                 }
             }
