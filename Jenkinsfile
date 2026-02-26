@@ -86,15 +86,10 @@ pipeline {
             }
         }
 
-        stage('E2E Testing - Frontend (Smoke Test)') {
+        stage('E2E Testing - Frontend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    script {
-                        // Verificamos que los archivos compilados existen
-                        // Esto garantiza que el "escenario de construcción" fue exitoso
-                        sh 'ls dist/its-app-frontend/index.html'
-                        echo "Prueba de humo exitosa: El artefacto del Frontend está listo para servirse."
-                    }
+                    sh 'npm run e2e' 
                 }
             }
         }
