@@ -88,8 +88,10 @@ pipeline {
 
         stage('E2E Testing - Frontend') {
             steps {
-                dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
-                    sh 'npm run e2e' 
+                nodejs('NodeJS-Angular') { 
+                    dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
+                        sh 'npm run e2e' 
+                    }
                 }
             }
         }

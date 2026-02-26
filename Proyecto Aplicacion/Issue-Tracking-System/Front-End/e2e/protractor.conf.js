@@ -20,10 +20,10 @@ exports.config = {
         "--headless",          // No abre ventana física
         "--no-sandbox",       // Necesario para correr como root en Docker
         "--disable-dev-shm-usage", // Evita errores de memoria en contenedores
-        "--disable-gpu"  // Ahorra recursos
       ]
     } // Hasta aquí lineas metidas por mi
   },
+  chromeDriver: '/usr/bin/chromedriver', //Añadimos tambien esta linea
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
   framework: 'jasmine',
