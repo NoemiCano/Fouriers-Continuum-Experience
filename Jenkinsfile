@@ -133,4 +133,58 @@ pipeline {
             }
         }
     }
+
+post {
+        always {
+            script {
+                def teamsUrl = 'https://default430f2559efe1453db47adb73887053.31.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8f4185b62fd447efb4e714b932b3743a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=alU7kkSWrwqWZwrn-9VkYYT8hCdMUlmGwlRjuv3Lj1o](https://default430f2559efe1453db47adb73887053.31.environment.api.powerplatform.com/powerautomate/automations/direct/workflows/8f4185b62fd447efb4e714b932b3743a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=alU7kkSWrwqWZwrn-9VkYYT8hCdMUlmGwlRjuv3Lj1o'
+                
+                // Definimos el color según el estado: Verde si éxito, Rojo si fallo
+                def color = (currentBuild.currentResult == 'SUCCESS') ? "#00FF00" : "#FF0000"
+                def statusText = (currentBuild.currentResult == 'SUCCESS') ? "✅ ÉXITO" : "❌ FALLO"
+
+                def payload = """{
+                    "type": "message",
+                    "attachments": [
+                        {
+                            "contentType": "application/vnd.microsoft.card.adaptive",
+                            "content": {
+                                "type": "AdaptiveCard",
+                                "body": [
+                                    {
+                                        "type": "TextBlock",
+                                        "size": "Medium",
+                                        "weight": "Bolder",
+                                        "text": "${statusText}: Proyecto ${env.JOB_NAME}"
+                                    },
+                                    {
+                                        "type": "TextBlock",
+                                        "text": "La construcción #${env.BUILD_NUMBER} ha finalizado.",
+                                        "wrap": true
+                                    }
+                                ],
+                                "actions": [
+                                    {
+                                        "type": "Action.OpenUrl",
+                                        "title": "Ver en Jenkins",
+                                        "url": "${env.BUILD_URL}"
+                                    }
+                                ],
+                                "\$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                                "version": "1.0"
+                            }
+                        }
+                    ]
+                }"""
+
+                // Enviamos la notificación usando curl
+                sh "curl -H 'Content-Type: application/json' -d '${payload}' '${teamsUrl}'"
+            }
+        }
+    }
+}
+
+
+
+
 }
