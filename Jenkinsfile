@@ -137,12 +137,10 @@ pipeline {
     post {
         always {
             script {
-                // URL LIMPIA (Sin corchetes al final)
-                def teamsUrl = 'https://default430f2559efe1453db47adb73887053.31.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8f4185b62fd447efb4e714b932b3743a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=alU7kkSWrwqWZwrn-9VkYYT8hCdMUlmGwlRjuv3Lj1o'
+                def teamsUrl = 'https://defaultb5dbc067042b4ed8b345b51c7e69d4.51.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/95c03c779d604c5e8f7d49cce2016a20/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=YUCQ3GrkbJW40poXjamlHqz_MO_AYThRby2gJ6ahrOs'
                 
                 def statusText = (currentBuild.currentResult == 'SUCCESS') ? "✅ ÉXITO" : "❌ FALLO"
 
-                // El JSON debe ir entre comillas simples en el comando SH para que no choque con las dobles del JSON
                 def payload = """{
                     "type": "message",
                     "attachments": [{
@@ -174,7 +172,6 @@ pipeline {
                         }
                     }]
                 }"""
-                // IMPORTANTE: Ponemos '${payload}' entre comillas simples para que curl lea el JSON correctamente
                 sh "curl -H 'Content-Type: application/json' -d '${payload}' '${teamsUrl}'"
             }
         }
