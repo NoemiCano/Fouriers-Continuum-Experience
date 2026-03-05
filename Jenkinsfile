@@ -9,6 +9,9 @@ pipeline {
 
     environment {
         SONARQUBE_ENV = 'sonarqube'
+        NEXUS_REGISTRY = "host.docker.internal:5000"
+        BACK_IMAGE_NAME = "host.docker.internal:5000/its-backend:latest"
+        FRONT_IMAGE_NAME = "host.docker.internal:5000/its-frontend:latest"
     }
 
     stages {
@@ -132,6 +135,31 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    echo "🚀 Iniciando despliegue en Producción..."
+                    
+                    // --- DESPLIEGUE FRONTEND (Puerto 8082) ---
+                    sh 'docker stop its-frontend-prod || true'
+                    sh 'docker rm its-frontend-prod || true'
+                    // Mapeamos 8082 -> 80 (Nginx interno)
+                    sh "docker run -d --name its-frontend-prod -p 8082:80 ${env.FRONT_IMAGE_NAME}"
+                    
+                    // --- DESPLIEGUE BACKEND (Puerto 8083) ---
+                    sh 'docker stop its-backend-prod || true'
+                    sh 'docker rm its-backend-prod || true'
+                    // Corregido: Mapeamos 8083 -> 8080 (Spring Boot interno)
+                    sh "docker run -d --name its-backend-prod -p 8083:8080 ${env.BACK_IMAGE_NAME}"
+                    
+                    sh 'docker image prune -f'
+                    
+                    echo "✅ Front disponible en: http://localhost:8082"
+                    echo "✅ Back disponible en: http://localhost:8083"
+                }
+            }
+        }
     }
 
     post {
@@ -140,7 +168,6 @@ pipeline {
                 def teamsUrl = 'https://defaultb5dbc067042b4ed8b345b51c7e69d4.51.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/95c03c779d604c5e8f7d49cce2016a20/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=YUCQ3GrkbJW40poXjamlHqz_MO_AYThRby2gJ6ahrOs'
                 
                 def statusText = (currentBuild.currentResult == 'SUCCESS') ? "✅ ÉXITO" : "❌ FALLO"
-
                 def payload = """{
                     "type": "message",
                     "attachments": [{
