@@ -136,26 +136,27 @@ pipeline {
             }
         }
 
-        stage('Deploy to Production') {
+       stage('Deploy to Production') {
             steps {
                 script {
-                    echo "🚀 Ajustando despliegue al puerto esperado por el Front (9096)..."
+                    echo "🚀 Desplegando Sistema Completo (Backend corregido al 9096)..."
                     
-                    // --- FRONTEND (8082) ---
-                    sh 'docker stop its-frontend-prod || true'
-                    sh 'docker rm its-frontend-prod || true'
+                    // 1. Limpieza de contenedores anteriores
+                    sh 'docker stop its-frontend-prod its-backend-prod || true'
+                    sh 'docker rm its-frontend-prod its-backend-prod || true'
+                    
+                    // 2. Despliegue Frontend (Puerto 8082 del PC -> Puerto 80 interno del Nginx)
                     sh "docker run -d --name its-frontend-prod -p 8082:80 ${env.FRONT_IMAGE_NAME}"
                     
-                    // --- BACKEND (Cambiamos el puerto de 8083 a 9096) ---
-                    sh 'docker stop its-backend-prod || true'
-                    sh 'docker rm its-backend-prod || true'
-                    // Mapeamos el puerto 9096 del host al 8080 del contenedor
-                    sh "docker run -d --name its-backend-prod -p 9096:8080 ${env.BACK_IMAGE_NAME}"
+                    // 3. Despliegue Backend (Puerto 9096 del PC -> Puerto 9096 interno del Spring Boot)
+                    // IMPORTANTE: Cambiamos 8080 por 9096 a la derecha de los dos puntos
+                    sh "docker run -d --name its-backend-prod -p 9096:9096 ${env.BACK_IMAGE_NAME}"
                     
                     sh 'docker image prune -f'
                     
-                    echo "✅ Front: http://localhost:8082"
-                    echo "✅ Back escuchando en: http://localhost:9096"
+                    echo "✅ Sistema listo."
+                    echo "🔗 Frontend: http://localhost:8082"
+                    echo "🔗 Backend API: http://localhost:9096"
                 }
             }
         }
