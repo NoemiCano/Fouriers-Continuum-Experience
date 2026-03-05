@@ -139,24 +139,23 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 script {
-                    echo "🚀 Iniciando despliegue en Producción..."
+                    echo "🚀 Ajustando despliegue al puerto esperado por el Front (9096)..."
                     
-                    // --- DESPLIEGUE FRONTEND (Puerto 8082) ---
+                    // --- FRONTEND (8082) ---
                     sh 'docker stop its-frontend-prod || true'
                     sh 'docker rm its-frontend-prod || true'
-                    // Mapeamos 8082 -> 80 (Nginx interno)
                     sh "docker run -d --name its-frontend-prod -p 8082:80 ${env.FRONT_IMAGE_NAME}"
                     
-                    // --- DESPLIEGUE BACKEND (Puerto 8083) ---
+                    // --- BACKEND (Cambiamos el puerto de 8083 a 9096) ---
                     sh 'docker stop its-backend-prod || true'
                     sh 'docker rm its-backend-prod || true'
-                    // Corregido: Mapeamos 8083 -> 8080 (Spring Boot interno)
-                    sh "docker run -d --name its-backend-prod -p 8083:8080 ${env.BACK_IMAGE_NAME}"
+                    // Mapeamos el puerto 9096 del host al 8080 del contenedor
+                    sh "docker run -d --name its-backend-prod -p 9096:8080 ${env.BACK_IMAGE_NAME}"
                     
                     sh 'docker image prune -f'
                     
-                    echo "✅ Front disponible en: http://localhost:8082"
-                    echo "✅ Back disponible en: http://localhost:8083"
+                    echo "✅ Front: http://localhost:8082"
+                    echo "✅ Back escuchando en: http://localhost:9096"
                 }
             }
         }
