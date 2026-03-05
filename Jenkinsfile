@@ -113,7 +113,7 @@ pipeline {
                     def frontImageName = "${nexusRegistry}/its-frontend"
 
                     // ESTA LÍNEA ES LA CLAVE: Evita que Docker use el proxy para la red local
-                    withEnv(["NO_PROXY=host.docker.internal,nexus,127.0.0.1,localhost"]) {
+                    withEnv(["HTTP_PROXY=", "HTTPS_PROXY=", "NO_PROXY=host.docker.internal,127.0.0.1,localhost,192.168.65.1"]) {
                         
                         docker.withRegistry("http://${nexusRegistry}", 'nexus-docker-credentials') {
                             
