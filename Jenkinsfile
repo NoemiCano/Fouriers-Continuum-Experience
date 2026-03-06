@@ -42,19 +42,11 @@ pipeline {
         stage('Compile & Package Backend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-                    // CAMBIO IMPORTANTE: Usamos 'package' para generar el archivo .jar
+                    // Usamos 'package' para generar el archivo .jar
                     sh 'mvn clean package -DskipTests'
                 }
             }
         }
-
-        // stage('Build Backend') {
-        //     steps {
-        //         dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
-        //             sh 'mvn clean compile'
-        //         }
-        //     }
-        // }
 
         stage('SonarQube Analysis Backend') {
             steps {
@@ -78,8 +70,6 @@ pipeline {
             }
         }
 
-        // Pruebas de integración del Back y Front
-
         stage('Integration Tests - Backend') {
             steps {
                 dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
@@ -102,29 +92,24 @@ pipeline {
             }
         }
 
-        // Publicación final en Nexus
-
         stage('Docker Build & Push to Nexus') {
             steps {
                 script {
-                    // Mantenemos tu configuración que ya funciona
                     def nexusRegistry = "host.docker.internal:5000" 
                     def backImageName = "${nexusRegistry}/its-backend"
                     def frontImageName = "${nexusRegistry}/its-frontend"
 
-                    // ESTA LÍNEA ES LA CLAVE: Evita que Docker use el proxy para la red local
+                    // Evita que Docker use el proxy para la red local
                     withEnv(["HTTP_PROXY=", "HTTPS_PROXY=", "NO_PROXY=host.docker.internal,127.0.0.1,localhost,192.168.65.1"]) {
                         
                         docker.withRegistry("http://${nexusRegistry}", 'nexus-docker-credentials') {
                             
-                            // 1. Backend (Ya funcionaba, pero lo repetimos)
                             dir('Proyecto Aplicacion/Issue-Tracking-System/Back-End') {
                                 def backImage = docker.build("${backImageName}:${env.BUILD_NUMBER}")
                                 backImage.push()
                                 backImage.push("latest")
                             }
 
-                            // 2. Frontend (Aquí es donde fallaba)
                             dir('Proyecto Aplicacion/Issue-Tracking-System/Front-End') {
                                 def frontImage = docker.build("${frontImageName}:${env.BUILD_NUMBER}")
                                 frontImage.push()
@@ -136,7 +121,7 @@ pipeline {
             }
         }
 
-       stage('Deploy to Production') {
+        stage('Deploy to Production') {
             steps {
                 script {
                     echo "🚀 Desplegando Sistema Completo (Backend corregido al 9096)..."
@@ -145,11 +130,10 @@ pipeline {
                     sh 'docker stop its-frontend-prod its-backend-prod || true'
                     sh 'docker rm its-frontend-prod its-backend-prod || true'
                     
-                    // 2. Despliegue Frontend (Puerto 8082 del PC -> Puerto 80 interno del Nginx)
+                    // 2. Despliegue Frontend
                     sh "docker run -d --name its-frontend-prod -p 8082:80 ${env.FRONT_IMAGE_NAME}"
                     
-                    // 3. Despliegue Backend (Puerto 9096 del PC -> Puerto 9096 interno del Spring Boot)
-                    // IMPORTANTE: Cambiamos 8080 por 9096 a la derecha de los dos puntos
+                    // 3. Despliegue Backend
                     sh "docker run -d --name its-backend-prod -p 9096:9096 ${env.BACK_IMAGE_NAME}"
                     
                     sh 'docker image prune -f'
